@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:15.3
+    container_name: sre-test-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=sretest
+      - POSTGRES_DB=afc_mp
+    volumes:
+      - sre-test-postgres-db:/var/lib/postgresql/data
+
+volumes:
+  sre-test-postgres-db:
