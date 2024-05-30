@@ -16,7 +16,6 @@ class NRARepositoryImplementation(NRARepository):
         nras_domain_list = []
         try:
             with Session(self.engine) as session:
-                session = Session(self.engine)
                 nras = session.query(NRADAO) \
                               .order_by(NRADAO.ruleset_id, NRADAO.certification_id) \
                               .all()
