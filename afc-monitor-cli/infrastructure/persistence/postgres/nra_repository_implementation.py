@@ -25,6 +25,6 @@ class NRARepositoryImplementation(NRARepository):
                                            is_authed=nra.is_authed, ruleset_id=nra.ruleset_id, 
                                            deployment_type=nra.deployment_type)
                     nras_domain_list.append(nra_domain)
-                return None, nras
+                return None, nras_domain_list
         except Exception as e:
             return e, []
