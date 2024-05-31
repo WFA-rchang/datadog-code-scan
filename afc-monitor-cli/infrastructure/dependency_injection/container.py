@@ -1,9 +1,12 @@
+import logging
 from dotenv import load_dotenv
 from dependency_injector import containers, providers
 
 from application.mp_application_implementation import MPApplicationImplementation
 from infrastructure.persistence.postgres.database.engine import PostgresEngineFactory
 from infrastructure.persistence.postgres.nra_repository_implementation import NRARepositoryImplementation
+from infrastructure.persistence.postgres.device_repository_implementation import DeviceRepositoryImplementation
+from infrastructure.persistence.postgres.contract_repository_implementation import ContractRepositoryImplementation
 
 
 class Container(containers.DeclarativeContainer):
@@ -25,6 +28,10 @@ class Container(containers.DeclarativeContainer):
     config.db_username.from_env("DB_USERNAME", required=True)
     config.db_password.from_env("DB_PASSWORD", required=True)
     config.db_name.from_env("DB_NAME", required=True)
+    config.log_level.from_env("LOG_LEVEL", default="INFO")
+
+    # Initialize logging
+    logging.basicConfig(level=logging.getLevelName(config.log_level()))
 
     # SQLAlchemy Engine
     postgres_engine = providers.Singleton(
@@ -42,8 +49,20 @@ class Container(containers.DeclarativeContainer):
         engine=postgres_engine
     )
 
+    contract_repository = providers.Factory(
+        ContractRepositoryImplementation,
+        engine=postgres_engine
+    )
+
+    device_repository = providers.Factory(
+        DeviceRepositoryImplementation,
+        engine=postgres_engine
+    )
+
     # Applications
     mp_application = providers.Factory(
         MPApplicationImplementation,
-        nra_repository=nra_repository
+        nra_repository=nra_repository,
+        contract_repository=contract_repository,
+        device_repository=device_repository
     )
