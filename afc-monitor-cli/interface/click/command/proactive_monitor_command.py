@@ -54,8 +54,12 @@ def proactive_monitor_command(mp_application: MPApplicationImplementation = Prov
                 device.nra.ruleset_id,
                 device.nra.certification_id,
                 device.serial_number,
-                device.license_id
+                device.license_id,
+                device.contract.contract_group_id,
+                device.contract.monthly_bucket
             ]
         )
-    click.echo(tabulate(registered_devices_list, headers=["Company Name", "Ruleset ID", "Certification ID", "Serial Number", "License ID"], tablefmt="fancy_grid"))
+    click.echo(tabulate(registered_devices_list,
+                        headers=["Company Name", "Ruleset ID", "Certification ID", "Serial Number", "License ID", "Contract Group ID", "Monthly Bucket"],
+                        tablefmt="fancy_grid"))
     click.echo("- End of newly registered devices -")
