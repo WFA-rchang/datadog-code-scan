@@ -2,6 +2,7 @@ from typing import List
 from typing import Tuple
 
 from domain.entity.nra_domain import NRADomain
+from domain.entity.device_domain import DeviceDomain
 from application.mp_application import MPApplication
 from domain.repository.nra_repository import NRARepository
 from domain.repository.device_repository import DeviceRepository
@@ -22,5 +23,5 @@ class MPApplicationImplementation(MPApplication):
     def get_companies_contracts_usages(self) -> Tuple[Exception, List[CompanyContractsUsagesValueObject]]:
         return self.contract_repository.get_companies_contracts_usages()
 
-    def get_registered_devices_in_period(self, period: str = '1d'):
+    def get_registered_devices_in_period(self, period: str = '1d') -> Tuple[Exception, List[DeviceDomain]]:
         return self.device_repository.get_registered_devices_in_period(period)
