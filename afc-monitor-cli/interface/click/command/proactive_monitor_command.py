@@ -42,7 +42,7 @@ def proactive_monitor_command(mp_application: MPApplicationImplementation = Prov
 
     # Get newly registered devices
     click.echo("- Getting newly registered devices within 1 day -")
-    error, devices = mp_application.get_registered_devices_in_period('2d')
+    error, devices = mp_application.get_registered_devices_in_period('1d')
     if error is not None:
         raise click.ClickException(error)
 
