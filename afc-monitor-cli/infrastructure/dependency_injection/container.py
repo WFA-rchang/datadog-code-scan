@@ -30,6 +30,7 @@ class Container(containers.DeclarativeContainer):
     config.db_username.from_env("DB_USERNAME", required=True)
     config.db_password.from_env("DB_PASSWORD", required=True)
     config.db_name.from_env("DB_NAME", required=True)
+    config.log_level.from_env("LOG_LEVEL", default="INFO")
     config.datadog_site.from_env("DATADOG_SITE", required=True)
     config.datadog_api_key.from_env("DATADOG_API_KEY", required=True)
     config.datadog_app_key.from_env("DATADOG_APP_KEY", required=True)
@@ -62,6 +63,7 @@ class Container(containers.DeclarativeContainer):
     device_repository = providers.Factory(
         DeviceRepositoryImplementation,
         engine=postgres_engine
+    )
 
     service_end_to_end_status_repository = providers.Factory(
         ServiceEndToEndStatusRepositoryImplementation,
