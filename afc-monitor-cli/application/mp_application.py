@@ -13,3 +13,7 @@ class MPApplication(ABC):
     @abstractmethod
     def get_registered_devices_in_period(period: str = '1d'):
         pass
+
+    @abstractmethod
+    def get_query_call_usages_in_period(period: str = '1d'):
+        pass
