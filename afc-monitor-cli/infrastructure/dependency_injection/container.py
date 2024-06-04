@@ -39,7 +39,8 @@ class Container(containers.DeclarativeContainer):
     config.datadog_site.from_env("DATADOG_SITE", required=True)
     config.datadog_api_key.from_env("DATADOG_API_KEY", required=True)
     config.datadog_app_key.from_env("DATADOG_APP_KEY", required=True)
-    config.datadog_monitor_env_tag.from_env("DATADOG_MONITOR_ENV_TAG", required=True)
+    config.datadog_monitor_env_tag.from_env(
+        "DATADOG_MONITOR_ENV_TAG", required=True)
     config.prometheus_host.from_env("PROMETHEUS_HOST", required=True)
 
     # Initialize logging
@@ -67,8 +68,8 @@ class Container(containers.DeclarativeContainer):
         NRARepositoryImplementation,
         engine=postgres_engine
     )
-    
-	system_health_repository = providers.Factory(
+
+    system_health_repository = providers.Factory(
         SystemHealthRepositoryImplementation,
         prometheus_connect=prometheus_connect
     )
@@ -108,10 +109,9 @@ class Container(containers.DeclarativeContainer):
     afc_service_status_application = providers.Factory(
         AFCServiceStatusApplicationImplementation,
         service_end_to_end_status_repository=service_end_to_end_status_repository
-	)
+    )
 
     system_health_application = providers.Factory(
         SystemHealthApplicationImplementation,
         system_health_repository=system_health_repository
     )
-
