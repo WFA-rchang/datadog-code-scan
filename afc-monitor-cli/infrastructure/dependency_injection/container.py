@@ -1,14 +1,17 @@
 import logging
 from dotenv import load_dotenv
+from prometheus_api_client import PrometheusConnect
 from dependency_injector import containers, providers
 
 from application.mp_application_implementation import MPApplicationImplementation
 from infrastructure.persistence.postgres.database.engine import PostgresEngineFactory
+from application.system_health_implementation import SystemHealthApplicationImplementation
 from infrastructure.persistence.postgres.nra_repository_implementation import NRARepositoryImplementation
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
 from infrastructure.persistence.postgres.device_repository_implementation import DeviceRepositoryImplementation
 from infrastructure.persistence.postgres.contract_repository_implementation import ContractRepositoryImplementation
 from infrastructure.persistence.postgres.query_call_repository_implementation import QueryCallRepositoryImplementation
+from infrastructure.service.prometheus.system_health_repository_implementation import SystemHealthRepositoryImplementation
 from infrastructure.service.datadog.service_end_to_end_status_repository_implementation import ServiceEndToEndStatusRepositoryImplementation
 
 
@@ -21,6 +24,7 @@ class Container(containers.DeclarativeContainer):
         modules=[],
         packages=[
             "interface.click.command.proactive_monitor_command",
+            "interface.click.command.system_health_command"
         ],
     )
 
@@ -36,6 +40,8 @@ class Container(containers.DeclarativeContainer):
     config.datadog_api_key.from_env("DATADOG_API_KEY", required=True)
     config.datadog_app_key.from_env("DATADOG_APP_KEY", required=True)
     config.datadog_monitor_env_tag.from_env("DATADOG_MONITOR_ENV_TAG", required=True)
+    config.prometheus_host.from_env("PROMETHEUS_HOST", required=True)
+    config.prometheus_monitoring_env("PROMETHEUS_MONITORING_ENV", default="production")
 
     # Initialize logging
     logging.basicConfig(level=logging.getLevelName(config.log_level()))
@@ -50,10 +56,22 @@ class Container(containers.DeclarativeContainer):
         db_name=config.db_name
     )
 
+    # Prometheus Connection
+    prometheus_connect = providers.Singleton(
+        PrometheusConnect,
+        url=config.prometheus_host,
+        disable_ssl=True
+    )
+
     # Repositories
     nra_repository = providers.Factory(
         NRARepositoryImplementation,
         engine=postgres_engine
+    )
+
+    system_health_repository = providers.Factory(
+        SystemHealthRepositoryImplementation,
+        prometheus_connect=prometheus_connect
     )
 
     contract_repository = providers.Factory(
@@ -91,4 +109,10 @@ class Container(containers.DeclarativeContainer):
     afc_service_status_application = providers.Factory(
         AFCServiceStatusApplicationImplementation,
         service_end_to_end_status_repository=service_end_to_end_status_repository
+    )
+
+    system_health_application = providers.Factory(
+        SystemHealthApplicationImplementation,
+        system_health_repository=system_health_repository,
+        default_env=config.prometheus_monitoring_env
     )
