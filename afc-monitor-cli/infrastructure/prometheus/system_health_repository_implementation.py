@@ -64,15 +64,12 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
 
         for system in system_names:
             if system in deployments:
-                cluster = f"afc-{env.split('-')[0]}"
-                # postfix for env like 'staging-hotfix', 'dev-feature'
-                namespace_postfix = f"-{env.split('-')[1]}" if len(
-                    env.split('-')) == 2 else ''
+                cluster = f"afc-{env}"
                 labels.append(
                     {
                         'deployment': deployments[system]['name'],
                         'cluster': cluster,
-                        'namespace': f"{deployments[system]['namespace']}{namespace_postfix}"
+                        'namespace': f"{deployments[system]['namespace']}"
                     }
                 )
 
