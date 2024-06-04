@@ -11,7 +11,7 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
     def __init__(self, prometheus_connect: PrometheusConnect):
         self.prometheus_connect = prometheus_connect
 
-    def get_system_health(self, system_names=[], env='staging') -> Tuple[Exception, List[SystemHealthDomain]]:
+    def get_system_health(self, system_names, env) -> Tuple[Exception, List[SystemHealthDomain]]:
 
         # define params for prometheus api
         metric_name = "kube_deployment_status_replicas_ready"
