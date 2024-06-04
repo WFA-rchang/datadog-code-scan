@@ -68,6 +68,11 @@ class Container(containers.DeclarativeContainer):
         NRARepositoryImplementation,
         engine=postgres_engine
     )
+    
+	system_health_repository = providers.Factory(
+        SystemHealthRepositoryImplementation,
+        prometheus_connect=prometheus_connect
+    )
 
     system_health_repository = providers.Factory(
         SystemHealthRepositoryImplementation,
@@ -109,6 +114,11 @@ class Container(containers.DeclarativeContainer):
     afc_service_status_application = providers.Factory(
         AFCServiceStatusApplicationImplementation,
         service_end_to_end_status_repository=service_end_to_end_status_repository
+	)
+
+    system_health_application = providers.Factory(
+        SystemHealthApplicationImplementation,
+        system_health_repository=system_health_repository
     )
 
     system_health_application = providers.Factory(
