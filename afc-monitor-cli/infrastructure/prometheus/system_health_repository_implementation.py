@@ -101,8 +101,11 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
                 status = 'OK'
             else:
                 status = 'Failed'
-            metrics_list.append(SystemHealthDomain(
-                name=metrics_tag_name_map[metrics_object['metric']['deployment']], status=status)
+            metrics_list.append(
+                SystemHealthDomain(
+                    name=metrics_tag_name_map[metrics_object['metric']['deployment']],
+                    status=status
+                )
             )
 
         return None, metrics_list
