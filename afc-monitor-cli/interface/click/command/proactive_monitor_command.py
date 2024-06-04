@@ -66,6 +66,25 @@ def proactive_monitor_command(mp_application: MPApplicationImplementation = Prov
                         tablefmt="fancy_grid"))
     click.echo("- End of newly registered devices -")
 
+    # Get Query Call Stats
+    click.echo("- Getting Query Call Stats within 1 day -")
+    error, query_call_usages = mp_application.get_query_call_usages_in_period('1d')
+    if error is not None:
+        raise click.ClickException(error)
+
+    query_call_usages_list = []
+    for query_call_usage in query_call_usages:
+        query_call_usages_list.append(
+            [
+                query_call_usage.company_name,
+                query_call_usage.usages
+            ]
+        )
+    click.echo(tabulate(query_call_usages_list,
+                        headers=["Company Name", "Usages"],
+                        tablefmt="fancy_grid"))
+    click.echo("- End of Query Call Stats -")
+
     # Get Datadog End to End Status
     click.echo("- Getting End to End Status -")
     error, end_to_end_status = afc_service_status_application.get_end_to_end_status()

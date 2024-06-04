@@ -8,6 +8,7 @@ from infrastructure.persistence.postgres.nra_repository_implementation import NR
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
 from infrastructure.persistence.postgres.device_repository_implementation import DeviceRepositoryImplementation
 from infrastructure.persistence.postgres.contract_repository_implementation import ContractRepositoryImplementation
+from infrastructure.persistence.postgres.query_call_repository_implementation import QueryCallRepositoryImplementation
 from infrastructure.service.datadog.service_end_to_end_status_repository_implementation import ServiceEndToEndStatusRepositoryImplementation
 
 
@@ -65,6 +66,11 @@ class Container(containers.DeclarativeContainer):
         engine=postgres_engine
     )
 
+    query_call_repository = providers.Factory(
+        QueryCallRepositoryImplementation,
+        engine=postgres_engine
+    )
+
     service_end_to_end_status_repository = providers.Factory(
         ServiceEndToEndStatusRepositoryImplementation,
         datadog_site=config.datadog_site,
@@ -78,7 +84,8 @@ class Container(containers.DeclarativeContainer):
         MPApplicationImplementation,
         nra_repository=nra_repository,
         contract_repository=contract_repository,
-        device_repository=device_repository
+        device_repository=device_repository,
+        query_call_repository=query_call_repository
     )
 
     afc_service_status_application = providers.Factory(
