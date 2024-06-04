@@ -11,7 +11,6 @@ from application.afc_service_status_application_implementation import AFCService
 from infrastructure.persistence.postgres.device_repository_implementation import DeviceRepositoryImplementation
 from infrastructure.persistence.postgres.contract_repository_implementation import ContractRepositoryImplementation
 from infrastructure.persistence.postgres.query_call_repository_implementation import QueryCallRepositoryImplementation
-from infrastructure.prometheus.system_health_repository_implementation import SystemHealthRepositoryImplementation
 from infrastructure.service.prometheus.system_health_repository_implementation import SystemHealthRepositoryImplementation
 from infrastructure.service.datadog.service_end_to_end_status_repository_implementation import ServiceEndToEndStatusRepositoryImplementation
 
@@ -42,6 +41,7 @@ class Container(containers.DeclarativeContainer):
     config.datadog_app_key.from_env("DATADOG_APP_KEY", required=True)
     config.datadog_monitor_env_tag.from_env("DATADOG_MONITOR_ENV_TAG", required=True)
     config.prometheus_host.from_env("PROMETHEUS_HOST", required=True)
+    config.prometheus_monitoring_env("PROMETHEUS_MONITORING_ENV", default="production")
 
     # Initialize logging
     logging.basicConfig(level=logging.getLevelName(config.log_level()))
@@ -113,5 +113,6 @@ class Container(containers.DeclarativeContainer):
 
     system_health_application = providers.Factory(
         SystemHealthApplicationImplementation,
-        system_health_repository=system_health_repository
+        system_health_repository=system_health_repository,
+        default_env=config.prometheus_monitoring_env
     )
