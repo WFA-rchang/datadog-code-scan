@@ -3,7 +3,7 @@ from typing import List, Tuple
 from prometheus_api_client import PrometheusConnect
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from domain.entity.system_health_domain import SystemHealthDomain
+from domain.value_object.system_health_value_object import SystemHealthValueObject
 from domain.repository.system_health_repository import SystemHealthRepository
 
 
@@ -11,7 +11,7 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
     def __init__(self, prometheus_connect: PrometheusConnect):
         self.prometheus_connect = prometheus_connect
 
-    def get_system_health(self, system_names, env) -> Tuple[Exception, List[SystemHealthDomain]]:
+    def get_system_health(self, system_names, env) -> Tuple[Exception, List[SystemHealthValueObject]]:
 
         # define params for prometheus api
         metric_name = "kube_deployment_status_replicas_ready"
@@ -102,7 +102,7 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
             else:
                 status = 'Failed'
             metrics_list.append(
-                SystemHealthDomain(
+                SystemHealthValueObject(
                     name=metrics_tag_name_map[metrics_object['metric']['deployment']],
                     status=status
                 )
