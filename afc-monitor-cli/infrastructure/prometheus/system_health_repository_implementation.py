@@ -19,7 +19,7 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
         deployments = {
             'als-viewer': {
                 'name': 'als-viewer-wifi-afc-als-viewer',
-                'namespace': 'open-afc',
+                'namespace': 'afc-als-viewer',
             },
             'msghnd': {
                 'name': 'afc-msghnd',
@@ -53,7 +53,7 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
             'mp-helper-wifi-afc-mp-helper': 'mp-helper',
             'mp-management-nginx-wifi-afc-mp-management-nginx': 'mp-management-nginx',
             'cp-wifi-afc-cp': 'cp',
-            'afc-als': 'als-viewer',
+            'als-viewer-wifi-afc-als-viewer': 'als-viewer',
             'afc-msghnd': 'msghnd'
         }
 
