@@ -3,3 +3,4 @@ python-dotenv==1.0.1
 SQLAlchemy==2.0.30
 psycopg2-binary==2.9.9
 dependency-injector==4.41.0
+datadog-api-client==2.25.0
