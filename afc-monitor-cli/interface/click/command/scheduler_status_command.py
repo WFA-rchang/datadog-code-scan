@@ -11,7 +11,7 @@ from application.scheduler_status_application_implementation import SchedulerSta
 @click.option('--env', '-e', help="Environment to check system health", required=True)
 @inject
 def scheduler_status_command(scheduler_status_application: SchedulerStatusApplicationImplementation = Provide[Container.scheduler_status_application],
-                          scheduler_names:str='', env: str = ''):
+                             scheduler_names:str='', env: str = ''):
     # Get Scheduler Status 
     click.echo("- Getting Scheduler Status -")
 
