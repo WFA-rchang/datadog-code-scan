@@ -2,7 +2,7 @@ import click
 from dependency_injector.wiring import Provide, inject
 
 from infrastructure.dependency_injection.container import Container
-from application.system_health_implementation import SystemHealthApplicationImplementation
+from application.system_health_application_implementation import SystemHealthApplicationImplementation
 
 
 @click.command(name='system-health', help="Execute System Health Check")

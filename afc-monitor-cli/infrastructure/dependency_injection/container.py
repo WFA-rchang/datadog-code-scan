@@ -5,7 +5,7 @@ from dependency_injector import containers, providers
 
 from application.mp_application_implementation import MPApplicationImplementation
 from infrastructure.persistence.postgres.database.engine import PostgresEngineFactory
-from application.system_health_implementation import SystemHealthApplicationImplementation
+from application.system_health_application_implementation import SystemHealthApplicationImplementation
 from infrastructure.persistence.postgres.nra_repository_implementation import NRARepositoryImplementation
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
 from infrastructure.persistence.postgres.device_repository_implementation import DeviceRepositoryImplementation
@@ -41,7 +41,7 @@ class Container(containers.DeclarativeContainer):
     config.datadog_app_key.from_env("DATADOG_APP_KEY", required=True)
     config.datadog_monitor_env_tag.from_env("DATADOG_MONITOR_ENV_TAG", required=True)
     config.prometheus_host.from_env("PROMETHEUS_HOST", required=True)
-    config.prometheus_monitoring_env("PROMETHEUS_MONITORING_ENV", default="production")
+    config.prometheus_monitoring_env.from_env("PROMETHEUS_MONITORING_ENV", default="production")
 
     # Initialize logging
     logging.basicConfig(level=logging.getLevelName(config.log_level()))
