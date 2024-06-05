@@ -84,10 +84,7 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
 
             prometheus_metrics_list = []
             for future in as_completed(futures_list):
-                if (len(prometheus_metrics_list) == 0):
-                    prometheus_metrics_list = future.result()
-                else:
-                    prometheus_metrics_list += future.result()
+                prometheus_metrics_list.extend(future.result())
         except Exception as e:
             logging.error(f"Error while fetching metrics: {e}")
             return e, []

@@ -10,6 +10,8 @@ class SchedulerStatusRepositoryImplementation(SchedulerStatusRepository):
         self.prometheus_connect = prometheus_connect
 
     def get_scheduler_status(self, scheduler_names, env) -> Tuple[Exception, List[SchedulerStatusValueObject]]:
+        
+        # define params for prometheus api
         metric_name = "argo_workflows_scheduler_execution_result"
         schedulers = {
             'helper-auto-release-scheduler': {
@@ -29,7 +31,7 @@ class SchedulerStatusRepositoryImplementation(SchedulerStatusRepository):
         target_scheduler_names = []
 
         if len(scheduler_names) == 0:
-            target_scheduler_names = schedulers.keys()
+            target_scheduler_names = schedulers.keys() # fetch all schedulers
         else: 
             for scheduler_name in scheduler_names:
                 if scheduler_name in schedulers:
@@ -51,10 +53,7 @@ class SchedulerStatusRepositoryImplementation(SchedulerStatusRepository):
 
             prometheus_metrics_list = []
             for future in as_completed(futures_list):
-                if (len(prometheus_metrics_list) == 0):
-                    prometheus_metrics_list = future.result()
-                else:
-                    prometheus_metrics_list += future.result()
+                prometheus_metrics_list.extend(future.result())
         except Exception as e:
             logging.error(f"Error while fetching metrics: {e}")
             return e, []
