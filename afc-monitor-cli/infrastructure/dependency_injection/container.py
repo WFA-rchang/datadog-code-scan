@@ -6,12 +6,14 @@ from dependency_injector import containers, providers
 from application.mp_application_implementation import MPApplicationImplementation
 from infrastructure.persistence.postgres.database.engine import PostgresEngineFactory
 from application.system_health_application_implementation import SystemHealthApplicationImplementation
+from application.scheduler_status_application_implementation import SchedulerStatusApplicationImplementation
 from infrastructure.persistence.postgres.nra_repository_implementation import NRARepositoryImplementation
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
 from infrastructure.persistence.postgres.device_repository_implementation import DeviceRepositoryImplementation
 from infrastructure.persistence.postgres.contract_repository_implementation import ContractRepositoryImplementation
 from infrastructure.persistence.postgres.query_call_repository_implementation import QueryCallRepositoryImplementation
 from infrastructure.service.prometheus.system_health_repository_implementation import SystemHealthRepositoryImplementation
+from infrastructure.service.prometheus.scheduler_status_repository_implementation import SchedulerStatusRepositoryImplementation    
 from infrastructure.service.datadog.service_end_to_end_status_repository_implementation import ServiceEndToEndStatusRepositoryImplementation
 
 
@@ -24,7 +26,8 @@ class Container(containers.DeclarativeContainer):
         modules=[],
         packages=[
             "interface.click.command.proactive_monitor_command",
-            "interface.click.command.system_health_command"
+            "interface.click.command.system_health_command",
+            "interface.click.command.scheduler_status_command"
         ],
     )
 
@@ -74,6 +77,11 @@ class Container(containers.DeclarativeContainer):
         prometheus_connect=prometheus_connect
     )
 
+    scheduler_status_repository = providers.Factory(
+        SchedulerStatusRepositoryImplementation,
+        prometheus_connect=prometheus_connect
+    )
+
     contract_repository = providers.Factory(
         ContractRepositoryImplementation,
         engine=postgres_engine
@@ -114,5 +122,11 @@ class Container(containers.DeclarativeContainer):
     system_health_application = providers.Factory(
         SystemHealthApplicationImplementation,
         system_health_repository=system_health_repository,
+        default_env=config.prometheus_monitoring_env
+    )
+
+    scheduler_status_application = providers.Factory(
+        SchedulerStatusApplicationImplementation,
+        scheduler_status_repository=scheduler_status_repository,
         default_env=config.prometheus_monitoring_env
     )
