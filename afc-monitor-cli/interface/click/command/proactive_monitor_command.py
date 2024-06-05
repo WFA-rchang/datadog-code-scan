@@ -117,12 +117,20 @@ def proactive_monitor_command(excel_out: bool,
 
     # Get System Health
     click.echo("- Getting System Health -")
-    error, system_healths = system_health_application.get_system_health(["cp"], None)
+    error, system_healths = system_health_application.get_system_health([], None)
     if error is not None:
         raise click.ClickException(error)
 
+    system_health_list = []
     for system_health in system_healths:
-        click.echo(f"System Name: {system_health.name}, Status: {system_health.status}")
+        system_health_list.append(
+            [
+                system_health.name,
+                system_health.status
+            ]
+        )
+    click.echo(tabulate(system_health_list, headers=["System Name", "Status"], tablefmt="fancy_grid"))
+    click.echo("- End of System Health -")
 
     # Export Excel when enabled
     if excel_out:
