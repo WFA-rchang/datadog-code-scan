@@ -1,6 +1,6 @@
 from typing import Tuple, List
 
-from application.system_health import SystemHealthApplication
+from application.system_health_application import SystemHealthApplication
 from domain.value_object.system_health_value_object import SystemHealthValueObject
 
 
