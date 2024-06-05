@@ -78,10 +78,8 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
         try:
             with ThreadPoolExecutor() as executor:
                 for label in labels:
-                    future = executor.submit(
-                        self.prometheus_connect.get_current_metric_value, metric_name=metric_name, label_config=label)
+                    future = executor.submit(self.prometheus_connect.get_current_metric_value, metric_name=metric_name, label_config=label)
                     futures_list.append(future)
-
             prometheus_metrics_list = []
             for future in as_completed(futures_list):
                 prometheus_metrics_list.extend(future.result())
@@ -104,5 +102,4 @@ class SystemHealthRepositoryImplementation(SystemHealthRepository):
                     status=status
                 )
             )
-
         return None, metrics_list
