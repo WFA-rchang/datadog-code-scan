@@ -5,6 +5,7 @@ from dependency_injector.wiring import Provide, inject
 from infrastructure.dependency_injection.container import Container
 from application.mp_application_implementation import MPApplicationImplementation
 from application.system_health_application_implementation import SystemHealthApplicationImplementation
+from application.scheduler_status_application_implementation import SchedulerStatusApplicationImplementation
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
 
 
@@ -14,7 +15,8 @@ from application.afc_service_status_application_implementation import AFCService
 def proactive_monitor_command(excel_out: bool,
                               mp_application: MPApplicationImplementation = Provide[Container.mp_application],
                               afc_service_status_application: AFCServiceStatusApplicationImplementation = Provide[Container.afc_service_status_application],
-                              system_health_application: SystemHealthApplicationImplementation = Provide[Container.system_health_application]):
+                              system_health_application: SystemHealthApplicationImplementation = Provide[Container.system_health_application],
+                              scheduler_status_application: SchedulerStatusApplicationImplementation = Provide[Container.scheduler_status_application]):
     # Get NRAs
     click.echo("- Getting NRAs -")
     error, nras = mp_application.get_nras()
@@ -131,6 +133,23 @@ def proactive_monitor_command(excel_out: bool,
         )
     click.echo(tabulate(system_health_list, headers=["System Name", "Status"], tablefmt="fancy_grid"))
     click.echo("- End of System Health -")
+
+    # Get Scheduler Status
+    click.echo("- Getting Scheduler Status -")
+    error, scheduler_status = scheduler_status_application.get_scheduler_status([], None)
+    if error is not None:
+        raise click.ClickException(error)
+
+    scheduler_status_list = []
+    for scheduler in scheduler_status:
+        scheduler_status_list.append(
+            [
+                scheduler.name,
+                scheduler.status
+            ]
+        )
+    click.echo(tabulate(scheduler_status_list, headers=["Scheduler Name", "Status"], tablefmt="fancy_grid"))
+    click.echo("- End of Scheduler Status -")
 
     # Export Excel when enabled
     if excel_out:
