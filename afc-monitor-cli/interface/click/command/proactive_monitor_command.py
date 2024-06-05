@@ -4,7 +4,7 @@ from dependency_injector.wiring import Provide, inject
 
 from infrastructure.dependency_injection.container import Container
 from application.mp_application_implementation import MPApplicationImplementation
-from application.system_health_implementation import SystemHealthApplicationImplementation
+from application.system_health_application_implementation import SystemHealthApplicationImplementation
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
 
 
