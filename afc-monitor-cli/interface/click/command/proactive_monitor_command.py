@@ -4,21 +4,35 @@ from dependency_injector.wiring import Provide, inject
 
 from infrastructure.dependency_injection.container import Container
 from application.mp_application_implementation import MPApplicationImplementation
+from application.system_health_application_implementation import SystemHealthApplicationImplementation
+from application.scheduler_status_application_implementation import SchedulerStatusApplicationImplementation
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
 
 
 @click.command(name='proactive-monitor', help="Execute Proactive Monitor")
+@click.option('--excel-out', default=False, show_default=True, is_flag=True)
 @inject
-def proactive_monitor_command(mp_application: MPApplicationImplementation = Provide[Container.mp_application],
-                              afc_service_status_application: AFCServiceStatusApplicationImplementation = Provide[Container.afc_service_status_application]):
+def proactive_monitor_command(excel_out: bool,
+                              mp_application: MPApplicationImplementation = Provide[Container.mp_application],
+                              afc_service_status_application: AFCServiceStatusApplicationImplementation = Provide[Container.afc_service_status_application],
+                              system_health_application: SystemHealthApplicationImplementation = Provide[Container.system_health_application],
+                              scheduler_status_application: SchedulerStatusApplicationImplementation = Provide[Container.scheduler_status_application]):
     # Get NRAs
     click.echo("- Getting NRAs -")
     error, nras = mp_application.get_nras()
     if error is not None:
         raise click.ClickException(error)
 
+    nra_list = []
     for nra in nras:
-        click.echo(f"Ruleset ID: {nra.ruleset_id}, Certification ID: {nra.certification_id}, Is Authed: {nra.is_authed}")
+        nra_list.append(
+            [
+                nra.ruleset_id,
+                nra.certification_id,
+                nra.is_authed
+            ]
+        )
+    click.echo(tabulate(nra_list, headers=["Ruleset ID", "Certification ID", "Is Authed"], tablefmt="fancy_grid"))
     click.echo("- End of NRAs -")
 
     # Get Companies Contracts Usages
@@ -90,8 +104,55 @@ def proactive_monitor_command(mp_application: MPApplicationImplementation = Prov
     error, end_to_end_status = afc_service_status_application.get_end_to_end_status()
     if error is not None:
         raise click.ClickException(error)
-    
+
+    end_to_end_status_list = []
     regions_status = end_to_end_status.regions_status
     for region in regions_status:
-        click.echo(f"Region: {region.region}, Status: {region.status}")
+        end_to_end_status_list.append(
+            [
+                region.region,
+                region.status
+            ]
+        )
+    click.echo(tabulate(end_to_end_status_list, headers=["Region", "Status"], tablefmt="fancy_grid"))
     click.echo("- End of End to End Status -")
+
+    # Get System Health
+    click.echo("- Getting System Health -")
+    error, system_healths = system_health_application.get_system_health([], None)
+    if error is not None:
+        raise click.ClickException(error)
+
+    system_health_list = []
+    for system_health in system_healths:
+        system_health_list.append(
+            [
+                system_health.name,
+                system_health.status
+            ]
+        )
+    click.echo(tabulate(system_health_list, headers=["System Name", "Status"], tablefmt="fancy_grid"))
+    click.echo("- End of System Health -")
+
+    # Get Scheduler Status
+    click.echo("- Getting Scheduler Status -")
+    error, scheduler_status = scheduler_status_application.get_scheduler_status([], None)
+    if error is not None:
+        raise click.ClickException(error)
+
+    scheduler_status_list = []
+    for scheduler in scheduler_status:
+        scheduler_status_list.append(
+            [
+                scheduler.name,
+                scheduler.status
+            ]
+        )
+    click.echo(tabulate(scheduler_status_list, headers=["Scheduler Name", "Status"], tablefmt="fancy_grid"))
+    click.echo("- End of Scheduler Status -")
+
+    # Export Excel when enabled
+    if excel_out:
+        click.echo("- Exporting Excel -")
+        # TODO Excel export logic
+        click.echo("- End of Excel Export -")
