@@ -4,17 +4,19 @@ from prometheus_api_client import PrometheusConnect
 from dependency_injector import containers, providers
 
 from application.mp_application_implementation import MPApplicationImplementation
-from infrastructure.persistence.postgres.database.engine import PostgresEngineFactory
 from application.system_health_application_implementation import SystemHealthApplicationImplementation
 from application.scheduler_status_application_implementation import SchedulerStatusApplicationImplementation
-from infrastructure.persistence.postgres.nra_repository_implementation import NRARepositoryImplementation
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
+from application.error_logs_application_implementation import ErrorLogsApplicationImplementation
+from infrastructure.persistence.postgres.database.engine import PostgresEngineFactory
+from infrastructure.persistence.postgres.nra_repository_implementation import NRARepositoryImplementation
 from infrastructure.persistence.postgres.device_repository_implementation import DeviceRepositoryImplementation
 from infrastructure.persistence.postgres.contract_repository_implementation import ContractRepositoryImplementation
 from infrastructure.persistence.postgres.query_call_repository_implementation import QueryCallRepositoryImplementation
 from infrastructure.service.prometheus.system_health_repository_implementation import SystemHealthRepositoryImplementation
 from infrastructure.service.prometheus.scheduler_status_repository_implementation import SchedulerStatusRepositoryImplementation    
 from infrastructure.service.datadog.service_end_to_end_status_repository_implementation import ServiceEndToEndStatusRepositoryImplementation
+from infrastructure.service.datadog.error_logs_repository_implementation import ErrorLogsRepositoryImplementation
 
 
 class Container(containers.DeclarativeContainer):
@@ -45,6 +47,9 @@ class Container(containers.DeclarativeContainer):
     config.datadog_monitor_env_tag.from_env("DATADOG_MONITOR_ENV_TAG", required=True)
     config.prometheus_host.from_env("PROMETHEUS_HOST", required=True)
     config.prometheus_monitoring_env.from_env("PROMETHEUS_MONITORING_ENV", default="production")
+    config.datadog_error_logs_status.from_env("DATADOG_ERROR_LOGS_STATUS", required=True)
+    config.datadog_error_logs_env_tag.from_env("DATADOG_ERROR_LOGS_ENV_TAG", required=True)
+    config.datadog_error_logs_index.from_env("DATADOG_ERROR_LOGS_INDEX", required=True)
 
     # Initialize logging
     logging.basicConfig(level=logging.getLevelName(config.log_level()))
@@ -105,6 +110,16 @@ class Container(containers.DeclarativeContainer):
         datadog_monitor_env_tag=config.datadog_monitor_env_tag
     )
 
+    error_logs_repository = providers.Factory(
+        ErrorLogsRepositoryImplementation,
+        datadog_site=config.datadog_site,
+        datadog_api_key=config.datadog_api_key,
+        datadog_app_key=config.datadog_app_key,
+        datadog_error_logs_status=config.datadog_error_logs_status,
+        datadog_error_logs_env_tag=config.datadog_error_logs_env_tag,
+        datadog_error_logs_index=config.datadog_error_logs_index
+    )
+
     # Applications
     mp_application = providers.Factory(
         MPApplicationImplementation,
@@ -129,4 +144,9 @@ class Container(containers.DeclarativeContainer):
         SchedulerStatusApplicationImplementation,
         scheduler_status_repository=scheduler_status_repository,
         default_env=config.prometheus_monitoring_env
+    )
+
+    error_logs_application = providers.Factory(
+        ErrorLogsApplicationImplementation,
+        error_logs_repository=error_logs_repository
     )
