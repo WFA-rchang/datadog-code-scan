@@ -60,7 +60,7 @@ class ErrorLogsRepositoryImplementation(ErrorLogsRepository):
             api_instance = LogsApi(api_client)
             try:
                 response = api_instance.aggregate_logs(body=body)
-                print(response)
+
                 # Convert the data to a list for processing
                 buckets = list(response.data.buckets)
 
