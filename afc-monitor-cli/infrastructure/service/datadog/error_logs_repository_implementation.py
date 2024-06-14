@@ -18,13 +18,11 @@ from domain.value_object.error_logs_value_object import ErrorLogsPatternCountVal
 
 
 class ErrorLogsRepositoryImplementation(ErrorLogsRepository):
-    def __init__(self, datadog_site: str, datadog_api_key: str, datadog_app_key: str, datadog_error_logs_status: str, datadog_error_logs_env_tag: str, datadog_error_logs_index: str):
+    def __init__(self, datadog_site: str, datadog_api_key: str, datadog_app_key: str, env_tag: str):
         self.datadog_site = datadog_site
         self.datadog_api_key = datadog_api_key
         self.datadog_app_key = datadog_app_key
-        self.datadog_error_logs_status = datadog_error_logs_status
-        self.datadog_error_logs_env_tag = datadog_error_logs_env_tag
-        self.datadog_error_logs_index = datadog_error_logs_index
+        self.env_tag = env_tag
 
     def get_error_logs(self) -> Tuple[Optional[Exception], ErrorLogsValueObject]:
         configuration = Configuration(
@@ -39,8 +37,8 @@ class ErrorLogsRepositoryImplementation(ErrorLogsRepository):
 
         body = LogsAggregateRequest(
             filter=LogsQueryFilter(
-                query=f"{self.datadog_error_logs_status} AND {self.datadog_error_logs_env_tag}",
-                indexes=[self.datadog_error_logs_index],
+                query=f"env:{self.env_tag} status:error ",
+                indexes=["*"],
                 _from="now-86400s",
                 to="now"
             ),
@@ -62,7 +60,7 @@ class ErrorLogsRepositoryImplementation(ErrorLogsRepository):
             api_instance = LogsApi(api_client)
             try:
                 response = api_instance.aggregate_logs(body=body)
-
+                print(response)
                 # Convert the data to a list for processing
                 buckets = list(response.data.buckets)
 
@@ -74,6 +72,9 @@ class ErrorLogsRepositoryImplementation(ErrorLogsRepository):
                     message = bucket.by.get('message', 'N/A')
                     count = bucket.computes.get('c0', 0)  # Get the count value
 
+                    # Skip empty messages
+                    if not message:
+                        continue
                     # Extract total count
                     if message == '__TOTAL__':
                         total_logs_count = count

@@ -47,9 +47,7 @@ class Container(containers.DeclarativeContainer):
     config.datadog_monitor_env_tag.from_env("DATADOG_MONITOR_ENV_TAG", required=True)
     config.prometheus_host.from_env("PROMETHEUS_HOST", required=True)
     config.prometheus_monitoring_env.from_env("PROMETHEUS_MONITORING_ENV", default="production")
-    config.datadog_error_logs_status.from_env("DATADOG_ERROR_LOGS_STATUS", required=True)
-    config.datadog_error_logs_env_tag.from_env("DATADOG_ERROR_LOGS_ENV_TAG", required=True)
-    config.datadog_error_logs_index.from_env("DATADOG_ERROR_LOGS_INDEX", required=True)
+    config.env_tag.from_env("ENV_TAG", required=True)
 
     # Initialize logging
     logging.basicConfig(level=logging.getLevelName(config.log_level()))
@@ -115,9 +113,7 @@ class Container(containers.DeclarativeContainer):
         datadog_site=config.datadog_site,
         datadog_api_key=config.datadog_api_key,
         datadog_app_key=config.datadog_app_key,
-        datadog_error_logs_status=config.datadog_error_logs_status,
-        datadog_error_logs_env_tag=config.datadog_error_logs_env_tag,
-        datadog_error_logs_index=config.datadog_error_logs_index
+        env_tag=config.env_tag,
     )
 
     # Applications
