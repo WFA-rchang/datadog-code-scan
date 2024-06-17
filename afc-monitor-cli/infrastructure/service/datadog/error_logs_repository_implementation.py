@@ -101,6 +101,5 @@ class ErrorLogsRepositoryImplementation(ErrorLogsRepository):
                     error_logs_pattern_counts=error_logs_pattern_count_value_object_list
                 )                    
                 return None, error_logs    
-            
             except Exception as e:
                 return e, []    
