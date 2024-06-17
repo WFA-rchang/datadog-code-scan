@@ -83,7 +83,7 @@ class ErrorLogsRepositoryImplementation(ErrorLogsRepository):
                     pattern_count_dict[message] += count
 
                 # Print sorted results and show logs for each cluster
-                sorted_patterns = sorted(pattern_count_dict.items(), key=lambda x: x[1], reverse=True)
+                sorted_patterns = sorted(pattern_count_dict.items(), key=lambda pattern_count: pattern_count[1], reverse=True)
 
                 error_logs_pattern_count_value_object_list = []
                 for pattern, count in sorted_patterns:
@@ -99,10 +99,8 @@ class ErrorLogsRepositoryImplementation(ErrorLogsRepository):
                         total_logs_count=total_logs_count
                     ),
                     error_logs_pattern_counts=error_logs_pattern_count_value_object_list
-                )
-                    
+                )                    
                 return None, error_logs    
-
+            
             except Exception as e:
-                return e, []
-    
+                return e, []    

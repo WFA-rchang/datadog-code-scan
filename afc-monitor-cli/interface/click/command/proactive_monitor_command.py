@@ -158,7 +158,6 @@ def proactive_monitor_command(excel_out: bool,
     click.echo(tabulate(error_logs_overall_list, headers=["Total Patterns", "Total Logs Count"], tablefmt="fancy_grid"))
     click.echo(tabulate(error_logs_list, headers=["Message", "Count"], tablefmt="fancy_grid", maxcolwidths=[80, None]))
     click.echo("- End of Datadog Error Logs -")
-
    
     # Get Scheduler Status
     click.echo("- Getting Scheduler Status -")
