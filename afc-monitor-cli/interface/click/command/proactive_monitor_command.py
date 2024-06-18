@@ -7,7 +7,7 @@ from application.mp_application_implementation import MPApplicationImplementatio
 from application.system_health_application_implementation import SystemHealthApplicationImplementation
 from application.scheduler_status_application_implementation import SchedulerStatusApplicationImplementation
 from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
-
+from application.error_logs_application_implementation import ErrorLogsApplicationImplementation
 
 @click.command(name='proactive-monitor', help="Execute Proactive Monitor")
 @click.option('--excel-out', default=False, show_default=True, is_flag=True)
@@ -16,7 +16,8 @@ def proactive_monitor_command(excel_out: bool,
                               mp_application: MPApplicationImplementation = Provide[Container.mp_application],
                               afc_service_status_application: AFCServiceStatusApplicationImplementation = Provide[Container.afc_service_status_application],
                               system_health_application: SystemHealthApplicationImplementation = Provide[Container.system_health_application],
-                              scheduler_status_application: SchedulerStatusApplicationImplementation = Provide[Container.scheduler_status_application]):
+                              scheduler_status_application: SchedulerStatusApplicationImplementation = Provide[Container.scheduler_status_application],
+                              error_logs_application: ErrorLogsApplicationImplementation = Provide[Container.error_logs_application]):
     # Get NRAs
     click.echo("- Getting NRAs -")
     error, nras = mp_application.get_nras()
@@ -134,6 +135,30 @@ def proactive_monitor_command(excel_out: bool,
     click.echo(tabulate(system_health_list, headers=["System Name", "Status"], tablefmt="fancy_grid"))
     click.echo("- End of System Health -")
 
+    # Get Datadog Error Logs
+    click.echo("- Getting Datadog Error Logs -")
+    error, error_logs = error_logs_application.get_error_logs()
+    if error is not None:
+        raise click.ClickException(error)
+
+    error_logs_overall_list = []
+    error_logs_overall_list.append([
+        error_logs.error_logs_overall.total_pattern_count,
+        error_logs.error_logs_overall.total_logs_count
+    ])
+
+    error_logs_list = []
+    for error_log in error_logs.error_logs_pattern_counts:
+        error_logs_list.append(
+            [
+                error_log.pattern,
+                error_log.count
+            ]  
+        )
+    click.echo(tabulate(error_logs_overall_list, headers=["Total Patterns", "Total Logs Count"], tablefmt="fancy_grid"))
+    click.echo(tabulate(error_logs_list, headers=["Message", "Count"], tablefmt="fancy_grid", maxcolwidths=[80, None]))
+    click.echo("- End of Datadog Error Logs -")
+   
     # Get Scheduler Status
     click.echo("- Getting Scheduler Status -")
     error, scheduler_status = scheduler_status_application.get_scheduler_status([], None)
