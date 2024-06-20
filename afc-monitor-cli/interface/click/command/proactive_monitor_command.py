@@ -160,8 +160,6 @@ def proactive_monitor_command(excel_out: bool,
                 error_log.count
             ]  
         )
-        error_logs_pattern_list.append(['----------------------------', '--------', '-----'])
-
 
     click.echo(tabulate(error_logs_service_list, headers=["Service", "Total Logs Count"], tablefmt="fancy_grid"))
     click.echo(tabulate(error_logs_pattern_list, headers=["Service", "Message", "Count"], tablefmt="fancy_grid", maxcolwidths=[None, 80, None]))
