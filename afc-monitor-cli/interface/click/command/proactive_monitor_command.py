@@ -139,24 +139,32 @@ def proactive_monitor_command(excel_out: bool,
     click.echo("- Getting Datadog Error Logs -")
     error, error_logs = error_logs_application.get_error_logs()
     if error is not None:
-        raise click.ClickException(error)
+        raise error
+        # raise click.ClickException(error)
 
-    error_logs_overall_list = []
-    error_logs_overall_list.append([
-        error_logs.error_logs_overall.total_pattern_count,
-        error_logs.error_logs_overall.total_logs_count
-    ])
-
-    error_logs_list = []
-    for error_log in error_logs.error_logs_pattern_counts:
-        error_logs_list.append(
+    error_logs_service_list = []
+    for error_log in error_logs.error_logs_service_counts:
+        error_logs_service_list.append(
             [
+                error_log.service,
+                error_log.count
+            ]  
+        )
+
+    error_logs_pattern_list = []
+    for error_log in error_logs.error_logs_pattern_counts:
+        error_logs_pattern_list.append(
+            [
+                error_log.service,
                 error_log.pattern,
                 error_log.count
             ]  
         )
-    click.echo(tabulate(error_logs_overall_list, headers=["Total Patterns", "Total Logs Count"], tablefmt="fancy_grid"))
-    click.echo(tabulate(error_logs_list, headers=["Message", "Count"], tablefmt="fancy_grid", maxcolwidths=[80, None]))
+        error_logs_pattern_list.append(['----------------------------', '--------', '-----'])
+
+
+    click.echo(tabulate(error_logs_service_list, headers=["Service", "Total Logs Count"], tablefmt="fancy_grid"))
+    click.echo(tabulate(error_logs_pattern_list, headers=["Service", "Message", "Count"], tablefmt="fancy_grid", maxcolwidths=[None, 80, None]))
     click.echo("- End of Datadog Error Logs -")
    
     # Get Scheduler Status
