@@ -139,8 +139,7 @@ def proactive_monitor_command(excel_out: bool,
     click.echo("- Getting Datadog Error Logs -")
     error, error_logs = error_logs_application.get_error_logs()
     if error is not None:
-        raise error
-        # raise click.ClickException(error)
+        raise click.ClickException(error)
 
     error_logs_service_list = []
     for error_log in error_logs.error_logs_service_counts:
