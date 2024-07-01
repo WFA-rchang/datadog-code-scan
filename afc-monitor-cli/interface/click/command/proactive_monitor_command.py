@@ -126,15 +126,15 @@ def proactive_monitor_command(excel_out: bool,
 
     end_to_end_dap_pap_status_list = []
     regions_status = dap_pap_status.regions_status
-    for item in regions_status:
+    for region in regions_status:
         end_to_end_dap_pap_status_list.append(
             [
-                item.monitor_name,
-                item.region,
-                item.status
+                region.monitor_name,
+                region.region,
+                region.status
             ]
         )
-    click.echo(tabulate(end_to_end_dap_pap_status_list, headers=["Service Name","Region", "Status"], tablefmt="fancy_grid"))
+    click.echo(tabulate(end_to_end_dap_pap_status_list, headers=["Service Name", "Region", "Status"], tablefmt="fancy_grid"))
     click.echo("- End of End to End Dap and Pap Status -")
 
     # Get System Health

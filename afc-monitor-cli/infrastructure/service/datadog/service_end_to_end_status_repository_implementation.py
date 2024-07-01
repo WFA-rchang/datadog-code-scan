@@ -84,6 +84,7 @@ class ServiceEndToEndStatusRepositoryImplementation(ServiceEndToEndStatusReposit
                     monitor_name = group_info.get('monitor_name')
                     region = group_info.get('group')
                     status = group_info.get('status')
+                    # Exclude redundant region and exclude mTLS status
                     if region == 'total':
                         if 'mTLS' not in monitor_name:
                             dap_and_pap_status_info = ServiceEndToEndDapPapRegionStatusValueObject(monitor_name=monitor_name, region=region, status=status)
