@@ -118,7 +118,7 @@ def proactive_monitor_command(excel_out: bool,
     click.echo(tabulate(end_to_end_status_list, headers=["Region", "Status"], tablefmt="fancy_grid"))
     click.echo("- End of End to End Status -")
 
-    # Get Datadog End to End Dap Pap Status
+    # Get Datadog End to End Dap and Pap Status
     click.echo("- Getting End to End Dap Pap Status -")
     error, dap_pap_status = afc_service_status_application.get_end_to_end_dap_and_pap_status()
     if error is not None:
@@ -135,7 +135,7 @@ def proactive_monitor_command(excel_out: bool,
             ]
         )
     click.echo(tabulate(end_to_end_dap_pap_status_list, headers=["Service Name","Region", "Status"], tablefmt="fancy_grid"))
-    click.echo("- End of End to End Dap Pap Status -")
+    click.echo("- End of End to End Dap and Pap Status -")
 
     # Get System Health
     click.echo("- Getting System Health -")
