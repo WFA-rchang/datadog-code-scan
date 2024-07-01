@@ -79,7 +79,7 @@ class ServiceEndToEndStatusRepositoryImplementation(ServiceEndToEndStatusReposit
                 dap_and_pap_status_value_object = ServiceEndToEndDapPapStatusValueObject()
                 dap_and_pap_status_info = None
 
-                # Extract 'group' and 'status' from groups
+                # Extract 'monitor_name', 'total' and 'status' from groups
                 for group_info in dap_and_pap_response ['groups']:
                     monitor_name = group_info.get('monitor_name')
                     region = group_info.get('group')
