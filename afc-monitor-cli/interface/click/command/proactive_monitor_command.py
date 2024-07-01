@@ -119,7 +119,7 @@ def proactive_monitor_command(excel_out: bool,
     click.echo("- End of End to End Status -")
 
     # Get Datadog End to End Dap and Pap Status
-    click.echo("- Getting End to End Dap Pap Status -")
+    click.echo("- Getting End to End Dap and Pap Status -")
     error, dap_pap_status = afc_service_status_application.get_end_to_end_dap_and_pap_status()
     if error is not None:
         raise click.ClickException(error)
