@@ -12,12 +12,13 @@ from domain.value_object.service_end_to_end_status_value_object import ServiceEn
 
 
 class ServiceEndToEndStatusRepositoryImplementation(ServiceEndToEndStatusRepository):
-    def __init__(self, datadog_site: str, datadog_api_key: str, datadog_app_key: str, datadog_monitor_mtls_env_tag: str, datadog_monitor_dap_pap_env_tag: str):
+    def __init__(self, datadog_site: str, datadog_api_key: str, datadog_app_key: str, datadog_monitor_mtls_env_tag: str, datadog_monitor_dap_pap_env_tag: str, env_tag:str):
         self.datadog_site = datadog_site
         self.datadog_api_key = datadog_api_key
         self.datadog_app_key = datadog_app_key
         self.datadog_monitor_mtls_env_tag = datadog_monitor_mtls_env_tag
-        self.datadog_monitor_dap_pap_env_tag = datadog_monitor_dap_pap_env_tag 
+        self.datadog_monitor_dap_pap_env_tag = datadog_monitor_dap_pap_env_tag
+        self.env_tag = env_tag
 
     def get_end_to_end_status(self) -> Tuple[Optional[Exception], ServiceEndToEndStatusValueObject]:
         # Datadog Search Monitor API
@@ -69,11 +70,13 @@ class ServiceEndToEndStatusRepositoryImplementation(ServiceEndToEndStatusReposit
                 "site": self.datadog_site
             }
         )
+        
+        query = f"{self.datadog_monitor_dap_pap_env_tag} AND env:{self.env_tag}"
 
         try:
             with ApiClient(configuration) as api_client:
                 api_instance = MonitorsApi(api_client)
-                dap_and_pap_response = api_instance.search_monitor_groups(query=self.datadog_monitor_dap_pap_env_tag)
+                dap_and_pap_response = api_instance.search_monitor_groups(query=query)
                 
                 # Create a list to store all status information
                 dap_and_pap_status_value_object = ServiceEndToEndDapPapStatusValueObject()
@@ -84,11 +87,9 @@ class ServiceEndToEndStatusRepositoryImplementation(ServiceEndToEndStatusReposit
                     monitor_name = group_info.get('monitor_name')
                     region = group_info.get('group')
                     status = group_info.get('status')
-                    # Exclude redundant region and exclude mTLS status
-                    if region == 'total':
-                        if 'mTLS' not in monitor_name:
-                            dap_and_pap_status_info = ServiceEndToEndDapPapRegionStatusValueObject(monitor_name=monitor_name, region=region, status=status)
-                            dap_and_pap_status_value_object.regions_status.append(dap_and_pap_status_info)
+
+                    dap_and_pap_status_info = ServiceEndToEndDapPapRegionStatusValueObject(monitor_name=monitor_name, region=region, status=status)
+                    dap_and_pap_status_value_object.regions_status.append(dap_and_pap_status_info)
             return None, dap_and_pap_status_value_object
 
         except Exception as e:

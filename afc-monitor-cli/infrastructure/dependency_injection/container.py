@@ -107,7 +107,8 @@ class Container(containers.DeclarativeContainer):
         datadog_api_key=config.datadog_api_key,
         datadog_app_key=config.datadog_app_key,
         datadog_monitor_mtls_env_tag=config.datadog_monitor_mtls_env_tag,
-        datadog_monitor_dap_pap_env_tag=config.datadog_monitor_dap_pap_env_tag
+        datadog_monitor_dap_pap_env_tag=config.datadog_monitor_dap_pap_env_tag,
+        env_tag=config.env_tag
     )
 
     error_logs_repository = providers.Factory(
