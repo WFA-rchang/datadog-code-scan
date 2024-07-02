@@ -71,16 +71,14 @@ class ServiceEndToEndStatusRepositoryImplementation(ServiceEndToEndStatusReposit
             }
         )
         
-        query = f"{self.datadog_monitor_dap_pap_env_tag} AND env:{self.env_tag}"
-
         try:
             with ApiClient(configuration) as api_client:
                 api_instance = MonitorsApi(api_client)
+                query = f"{self.datadog_monitor_dap_pap_env_tag} AND env:{self.env_tag}"
                 dap_and_pap_response = api_instance.search_monitor_groups(query=query)
                 
                 # Create a list to store all status information
                 dap_and_pap_status_value_object = ServiceEndToEndDapPapStatusValueObject()
-                dap_and_pap_status_info = None
 
                 # Extract 'monitor_name', 'total' and 'status' from groups
                 for group_info in dap_and_pap_response ['groups']:
