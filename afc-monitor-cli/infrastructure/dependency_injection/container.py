@@ -44,7 +44,8 @@ class Container(containers.DeclarativeContainer):
     config.datadog_site.from_env("DATADOG_SITE", required=True)
     config.datadog_api_key.from_env("DATADOG_API_KEY", required=True)
     config.datadog_app_key.from_env("DATADOG_APP_KEY", required=True)
-    config.datadog_monitor_env_tag.from_env("DATADOG_MONITOR_ENV_TAG", required=True)
+    config.datadog_monitor_mtls_env_tag.from_env("DATADOG_MONITOR_MTLS_ENV_TAG", required=True)
+    config.datadog_monitor_dap_pap_env_tag.from_env("DATADOG_MONITOR_DAP_PAP_ENV_TAG", required=True)
     config.prometheus_host.from_env("PROMETHEUS_HOST", required=True)
     config.prometheus_monitoring_env.from_env("PROMETHEUS_MONITORING_ENV", default="production")
     config.env_tag.from_env("ENV_TAG", required=True)
@@ -105,7 +106,9 @@ class Container(containers.DeclarativeContainer):
         datadog_site=config.datadog_site,
         datadog_api_key=config.datadog_api_key,
         datadog_app_key=config.datadog_app_key,
-        datadog_monitor_env_tag=config.datadog_monitor_env_tag
+        datadog_monitor_mtls_env_tag=config.datadog_monitor_mtls_env_tag,
+        datadog_monitor_dap_pap_env_tag=config.datadog_monitor_dap_pap_env_tag,
+        env_tag=config.env_tag
     )
 
     error_logs_repository = providers.Factory(
@@ -113,7 +116,7 @@ class Container(containers.DeclarativeContainer):
         datadog_site=config.datadog_site,
         datadog_api_key=config.datadog_api_key,
         datadog_app_key=config.datadog_app_key,
-        env_tag=config.env_tag,
+        env_tag=config.env_tag
     )
 
     # Applications
