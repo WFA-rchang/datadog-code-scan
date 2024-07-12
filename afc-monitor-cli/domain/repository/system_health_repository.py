@@ -7,5 +7,7 @@ from domain.value_object.system_health_value_object import SystemHealthValueObje
 
 class SystemHealthRepository(ABC):
     @abstractmethod
-    def get_system_health(self, system_names: List[str], env: str) -> Tuple[Exception, List[SystemHealthValueObject]]:
+    def get_system_health(
+        self, system_names: List[str], cluster: str, env: str
+    ) -> Tuple[Exception, List[SystemHealthValueObject]]:
         pass

@@ -1,23 +1,41 @@
 import click
-from tabulate import tabulate
-from dependency_injector.wiring import Provide, inject
-
-from infrastructure.dependency_injection.container import Container
+from application.afc_service_status_application_implementation import (
+    AFCServiceStatusApplicationImplementation,
+)
+from application.error_logs_application_implementation import (
+    ErrorLogsApplicationImplementation,
+)
 from application.mp_application_implementation import MPApplicationImplementation
-from application.system_health_application_implementation import SystemHealthApplicationImplementation
-from application.scheduler_status_application_implementation import SchedulerStatusApplicationImplementation
-from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
-from application.error_logs_application_implementation import ErrorLogsApplicationImplementation
+from application.scheduler_status_application_implementation import (
+    SchedulerStatusApplicationImplementation,
+)
+from application.system_health_application_implementation import (
+    SystemHealthApplicationImplementation,
+)
+from dependency_injector.wiring import Provide, inject
+from infrastructure.dependency_injection.container import Container
+from tabulate import tabulate
 
-@click.command(name='proactive-monitor', help="Execute Proactive Monitor")
-@click.option('--excel-out', default=False, show_default=True, is_flag=True)
+
+@click.command(name="proactive-monitor", help="Execute Proactive Monitor")
+@click.option("--excel-out", default=False, show_default=True, is_flag=True)
 @inject
-def proactive_monitor_command(excel_out: bool,
-                              mp_application: MPApplicationImplementation = Provide[Container.mp_application],
-                              afc_service_status_application: AFCServiceStatusApplicationImplementation = Provide[Container.afc_service_status_application],
-                              system_health_application: SystemHealthApplicationImplementation = Provide[Container.system_health_application],
-                              scheduler_status_application: SchedulerStatusApplicationImplementation = Provide[Container.scheduler_status_application],
-                              error_logs_application: ErrorLogsApplicationImplementation = Provide[Container.error_logs_application]):
+def proactive_monitor_command(
+    excel_out: bool,
+    mp_application: MPApplicationImplementation = Provide[Container.mp_application],
+    afc_service_status_application: AFCServiceStatusApplicationImplementation = Provide[
+        Container.afc_service_status_application
+    ],
+    system_health_application: SystemHealthApplicationImplementation = Provide[
+        Container.system_health_application
+    ],
+    scheduler_status_application: SchedulerStatusApplicationImplementation = Provide[
+        Container.scheduler_status_application
+    ],
+    error_logs_application: ErrorLogsApplicationImplementation = Provide[
+        Container.error_logs_application
+    ],
+):
     # Get NRAs
     click.echo("- Getting NRAs -")
     error, nras = mp_application.get_nras()
@@ -26,14 +44,14 @@ def proactive_monitor_command(excel_out: bool,
 
     nra_list = []
     for nra in nras:
-        nra_list.append(
-            [
-                nra.ruleset_id,
-                nra.certification_id,
-                nra.is_authed
-            ]
+        nra_list.append([nra.ruleset_id, nra.certification_id, nra.is_authed])
+    click.echo(
+        tabulate(
+            nra_list,
+            headers=["Ruleset ID", "Certification ID", "Is Authed"],
+            tablefmt="fancy_grid",
         )
-    click.echo(tabulate(nra_list, headers=["Ruleset ID", "Certification ID", "Is Authed"], tablefmt="fancy_grid"))
+    )
     click.echo("- End of NRAs -")
 
     # Get Companies Contracts Usages
@@ -51,15 +69,21 @@ def proactive_monitor_command(excel_out: bool,
                         company_contracts_usage.company_name,
                         contract_group.comtract_group_id,
                         monthly_bucket.month,
-                        monthly_bucket.licensed_count
+                        monthly_bucket.licensed_count,
                     ]
                 )
-    click.echo(tabulate(companies_contracts_usages_list, headers=["Company Name", "Contract Group ID", "Month", "Licensed Count"], tablefmt="fancy_grid"))
+    click.echo(
+        tabulate(
+            companies_contracts_usages_list,
+            headers=["Company Name", "Contract Group ID", "Month", "Licensed Count"],
+            tablefmt="fancy_grid",
+        )
+    )
     click.echo("- End of Companies Contracts Usages -")
 
     # Get newly registered devices
     click.echo("- Getting newly registered devices within 1 day -")
-    error, devices = mp_application.get_registered_devices_in_period('1d')
+    error, devices = mp_application.get_registered_devices_in_period("1d")
     if error is not None:
         raise click.ClickException(error)
 
@@ -73,31 +97,44 @@ def proactive_monitor_command(excel_out: bool,
                 device.serial_number,
                 device.license_id,
                 device.contract.contract_group_id,
-                device.contract.monthly_bucket
+                device.contract.monthly_bucket,
             ]
         )
-    click.echo(tabulate(registered_devices_list,
-                        headers=["Company Name", "Ruleset ID", "Certification ID", "Serial Number", "License ID", "Contract Group ID", "Monthly Bucket"],
-                        tablefmt="fancy_grid"))
+    click.echo(
+        tabulate(
+            registered_devices_list,
+            headers=[
+                "Company Name",
+                "Ruleset ID",
+                "Certification ID",
+                "Serial Number",
+                "License ID",
+                "Contract Group ID",
+                "Monthly Bucket",
+            ],
+            tablefmt="fancy_grid",
+        )
+    )
     click.echo("- End of newly registered devices -")
 
     # Get Query Call Stats
     click.echo("- Getting Query Call Stats within 1 day -")
-    error, query_call_usages = mp_application.get_query_call_usages_in_period('1d')
+    error, query_call_usages = mp_application.get_query_call_usages_in_period("1d")
     if error is not None:
         raise click.ClickException(error)
 
     query_call_usages_list = []
     for query_call_usage in query_call_usages:
         query_call_usages_list.append(
-            [
-                query_call_usage.company_name,
-                query_call_usage.usages
-            ]
+            [query_call_usage.company_name, query_call_usage.usages]
         )
-    click.echo(tabulate(query_call_usages_list,
-                        headers=["Company Name", "Usages"],
-                        tablefmt="fancy_grid"))
+    click.echo(
+        tabulate(
+            query_call_usages_list,
+            headers=["Company Name", "Usages"],
+            tablefmt="fancy_grid",
+        )
+    )
     click.echo("- End of Query Call Stats -")
 
     # Get Datadog End to End Status
@@ -109,18 +146,19 @@ def proactive_monitor_command(excel_out: bool,
     end_to_end_status_list = []
     regions_status = end_to_end_status.regions_status
     for region in regions_status:
-        end_to_end_status_list.append(
-            [
-                region.region,
-                region.status
-            ]
+        end_to_end_status_list.append([region.region, region.status])
+    click.echo(
+        tabulate(
+            end_to_end_status_list, headers=["Region", "Status"], tablefmt="fancy_grid"
         )
-    click.echo(tabulate(end_to_end_status_list, headers=["Region", "Status"], tablefmt="fancy_grid"))
+    )
     click.echo("- End of End to End Status -")
 
     # Get Datadog End to End Dap and Pap Status
     click.echo("- Getting End to End Dap and Pap Status -")
-    error, dap_pap_status = afc_service_status_application.get_end_to_end_dap_and_pap_status()
+    error, dap_pap_status = (
+        afc_service_status_application.get_end_to_end_dap_and_pap_status()
+    )
     if error is not None:
         raise click.ClickException(error)
 
@@ -128,30 +166,31 @@ def proactive_monitor_command(excel_out: bool,
     regions_status = dap_pap_status.regions_status
     for region in regions_status:
         end_to_end_dap_pap_status_list.append(
-            [
-                region.monitor_name,
-                region.region,
-                region.status
-            ]
+            [region.monitor_name, region.region, region.status]
         )
-    click.echo(tabulate(end_to_end_dap_pap_status_list, headers=["Service Name", "Region", "Status"], tablefmt="fancy_grid"))
+    click.echo(
+        tabulate(
+            end_to_end_dap_pap_status_list,
+            headers=["Service Name", "Region", "Status"],
+            tablefmt="fancy_grid",
+        )
+    )
     click.echo("- End of End to End Dap and Pap Status -")
 
     # Get System Health
     click.echo("- Getting System Health -")
-    error, system_healths = system_health_application.get_system_health([], None)
+    error, system_healths = system_health_application.get_system_health([], None, None)
     if error is not None:
         raise click.ClickException(error)
 
     system_health_list = []
     for system_health in system_healths:
-        system_health_list.append(
-            [
-                system_health.name,
-                system_health.status
-            ]
+        system_health_list.append([system_health.name, system_health.status])
+    click.echo(
+        tabulate(
+            system_health_list, headers=["System Name", "Status"], tablefmt="fancy_grid"
         )
-    click.echo(tabulate(system_health_list, headers=["System Name", "Status"], tablefmt="fancy_grid"))
+    )
     click.echo("- End of System Health -")
 
     # Get Datadog Error Logs
@@ -162,42 +201,49 @@ def proactive_monitor_command(excel_out: bool,
 
     error_logs_service_list = []
     for error_log in error_logs.error_logs_service_counts:
-        error_logs_service_list.append(
-            [
-                error_log.service,
-                error_log.count
-            ]  
-        )
+        error_logs_service_list.append([error_log.service, error_log.count])
 
     error_logs_pattern_list = []
     for error_log in error_logs.error_logs_pattern_counts:
         error_logs_pattern_list.append(
-            [
-                error_log.service,
-                error_log.pattern,
-                error_log.count
-            ]  
+            [error_log.service, error_log.pattern, error_log.count]
         )
 
-    click.echo(tabulate(error_logs_service_list, headers=["Service", "Total Logs Count"], tablefmt="fancy_grid"))
-    click.echo(tabulate(error_logs_pattern_list, headers=["Service", "Message", "Count"], tablefmt="fancy_grid", maxcolwidths=[None, 80, None]))
+    click.echo(
+        tabulate(
+            error_logs_service_list,
+            headers=["Service", "Total Logs Count"],
+            tablefmt="fancy_grid",
+        )
+    )
+    click.echo(
+        tabulate(
+            error_logs_pattern_list,
+            headers=["Service", "Message", "Count"],
+            tablefmt="fancy_grid",
+            maxcolwidths=[None, 80, None],
+        )
+    )
     click.echo("- End of Datadog Error Logs -")
-   
+
     # Get Scheduler Status
     click.echo("- Getting Scheduler Status -")
-    error, scheduler_status = scheduler_status_application.get_scheduler_status([], None)
+    error, scheduler_status = scheduler_status_application.get_scheduler_status(
+        [], None
+    )
     if error is not None:
         raise click.ClickException(error)
 
     scheduler_status_list = []
     for scheduler in scheduler_status:
-        scheduler_status_list.append(
-            [
-                scheduler.name,
-                scheduler.status
-            ]
+        scheduler_status_list.append([scheduler.name, scheduler.status])
+    click.echo(
+        tabulate(
+            scheduler_status_list,
+            headers=["Scheduler Name", "Status"],
+            tablefmt="fancy_grid",
         )
-    click.echo(tabulate(scheduler_status_list, headers=["Scheduler Name", "Status"], tablefmt="fancy_grid"))
+    )
     click.echo("- End of Scheduler Status -")
 
     # Export Excel when enabled

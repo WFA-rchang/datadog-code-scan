@@ -48,6 +48,7 @@ class Container(containers.DeclarativeContainer):
     config.datadog_monitor_dap_pap_env_tag.from_env("DATADOG_MONITOR_DAP_PAP_ENV_TAG", required=True)
     config.prometheus_host.from_env("PROMETHEUS_HOST", required=True)
     config.prometheus_monitoring_env.from_env("PROMETHEUS_MONITORING_ENV", default="production")
+    config.prometheus_monitoring_cluster.from_env("PROMETHEUS_MONITORING_CLUSTER", default="production")
     config.env_tag.from_env("ENV_TAG", required=True)
 
     # Initialize logging
@@ -136,7 +137,8 @@ class Container(containers.DeclarativeContainer):
     system_health_application = providers.Factory(
         SystemHealthApplicationImplementation,
         system_health_repository=system_health_repository,
-        default_env=config.prometheus_monitoring_env
+        default_env=config.prometheus_monitoring_env,
+        default_cluster=config.prometheus_monitoring_cluster
     )
 
     scheduler_status_application = providers.Factory(
