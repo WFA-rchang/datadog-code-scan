@@ -89,6 +89,9 @@ def gen_sla_report_command(date_start, date_end, metrics_gateway_url):
     service_availability_table = doc.tables[1]
 
     # Update Service Availability and Down Time Table
+    if len(sla_quarterly_report_availabilities) != 3:
+        raise click.ClickException("SLA Report must have 3 availabilities data")
+
     click.echo("Update Service Availability and Down Time...")
     for i in range(3):
         sla_quarterly_report_availability_object = sla_quarterly_report_availabilities[i]
