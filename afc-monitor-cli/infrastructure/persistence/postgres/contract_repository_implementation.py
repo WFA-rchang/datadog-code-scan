@@ -1,19 +1,24 @@
 import logging
-from typing import List
-from typing import Tuple
-from sqlalchemy import select
-from sqlalchemy.orm import aliased
-from sqlalchemy.orm import Session
-from sqlalchemy.engine import Engine
+from typing import (
+    List,
+    Tuple,
+)
 
+from sqlalchemy import select
+from sqlalchemy.orm import (
+    Session,
+    aliased,
+)
+from sqlalchemy.engine import Engine
 from domain.repository.contract_repository import ContractRepository
 from infrastructure.persistence.postgres.dao.company_dao import CompanyDAO
 from infrastructure.persistence.postgres.dao.contract_dao import ContractDAO
+from domain.value_object.company_contracts_usages_value_object import (
+    MonthlyBucketUsageValueObject,
+    ContractGroupUsagesValueObject,
+    CompanyContractsUsagesValueObject,
+)
 from infrastructure.persistence.postgres.dao.contract_group_dao import ContractGroupDAO
-from domain.value_object.company_contracts_usages_value_object import MonthlyBucketUsageValueObject
-from domain.value_object.company_contracts_usages_value_object import ContractGroupUsagesValueObject
-from domain.value_object.company_contracts_usages_value_object import CompanyContractsUsagesValueObject
-
 
 logger = logging.getLogger(__name__)
 
@@ -30,19 +35,11 @@ class ContractRepositoryImplementation(ContractRepository):
                 mcg = aliased(ContractGroupDAO, name='mcg')
                 mco = aliased(CompanyDAO, name='mco')
 
-                statement = select(
-                    mco.name.label("company_name"),
-                    mc.contract_group_id,
-                    mc.monthly_bucket,
-                    mc.licensed_count
-                ).join(
-                    mcg, mc.contract_group_id == mcg.id
-                ).join(
-                    mco, mcg.company_id == mco.id
-                ).order_by(
-                    mco.name,
-                    mc.contract_group_id,
-                    mc.monthly_bucket.asc()
+                statement = (
+                    select(mco.name.label("company_name"), mc.contract_group_id, mc.monthly_bucket, mc.licensed_count)
+                    .join(mcg, mc.contract_group_id == mcg.id)
+                    .join(mco, mcg.company_id == mco.id)
+                    .order_by(mco.name, mc.contract_group_id, mc.monthly_bucket.asc())
                 )
 
                 result = session.execute(statement).all()

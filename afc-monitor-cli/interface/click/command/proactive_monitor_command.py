@@ -1,20 +1,15 @@
 import click
-from application.afc_service_status_application_implementation import (
-    AFCServiceStatusApplicationImplementation,
-)
-from application.error_logs_application_implementation import (
-    ErrorLogsApplicationImplementation,
-)
-from application.mp_application_implementation import MPApplicationImplementation
-from application.scheduler_status_application_implementation import (
-    SchedulerStatusApplicationImplementation,
-)
-from application.system_health_application_implementation import (
-    SystemHealthApplicationImplementation,
-)
-from dependency_injector.wiring import Provide, inject
-from infrastructure.dependency_injection.container import Container
 from tabulate import tabulate
+from dependency_injector.wiring import (
+    Provide,
+    inject,
+)
+from infrastructure.dependency_injection.container import Container
+from application.mp_application_implementation import MPApplicationImplementation
+from application.error_logs_application_implementation import ErrorLogsApplicationImplementation
+from application.system_health_application_implementation import SystemHealthApplicationImplementation
+from application.scheduler_status_application_implementation import SchedulerStatusApplicationImplementation
+from application.afc_service_status_application_implementation import AFCServiceStatusApplicationImplementation
 
 
 @click.command(name="proactive-monitor", help="Execute Proactive Monitor")
@@ -26,15 +21,11 @@ def proactive_monitor_command(
     afc_service_status_application: AFCServiceStatusApplicationImplementation = Provide[
         Container.afc_service_status_application
     ],
-    system_health_application: SystemHealthApplicationImplementation = Provide[
-        Container.system_health_application
-    ],
+    system_health_application: SystemHealthApplicationImplementation = Provide[Container.system_health_application],
     scheduler_status_application: SchedulerStatusApplicationImplementation = Provide[
         Container.scheduler_status_application
     ],
-    error_logs_application: ErrorLogsApplicationImplementation = Provide[
-        Container.error_logs_application
-    ],
+    error_logs_application: ErrorLogsApplicationImplementation = Provide[Container.error_logs_application],
 ):
     # Get NRAs
     click.echo("- Getting NRAs -")
@@ -126,12 +117,17 @@ def proactive_monitor_command(
     query_call_usages_list = []
     for query_call_usage in query_call_usages:
         query_call_usages_list.append(
-            [query_call_usage.company_name, query_call_usage.usages]
+            [
+                query_call_usage.company_name,
+                query_call_usage.normal_usages,
+                query_call_usage.channel_evaluation_usages,
+                query_call_usage.total_usages,
+            ]
         )
     click.echo(
         tabulate(
             query_call_usages_list,
-            headers=["Company Name", "Usages"],
+            headers=["Company Name", "Normal Usages", "Channel Evaluation Usages", "Total Usages"],
             tablefmt="fancy_grid",
         )
     )
@@ -147,11 +143,7 @@ def proactive_monitor_command(
     regions_status = end_to_end_status.regions_status
     for region in regions_status:
         end_to_end_status_list.append([region.region, region.status])
-    click.echo(
-        tabulate(
-            end_to_end_status_list, headers=["Region", "Status"], tablefmt="fancy_grid"
-        )
-    )
+    click.echo(tabulate(end_to_end_status_list, headers=["Region", "Status"], tablefmt="fancy_grid"))
     click.echo("- End of End to End Status -")
 
     # Get Datadog End to End Dap and Pap Status
@@ -165,9 +157,7 @@ def proactive_monitor_command(
     end_to_end_dap_pap_status_list = []
     regions_status = dap_pap_status.regions_status
     for region in regions_status:
-        end_to_end_dap_pap_status_list.append(
-            [region.monitor_name, region.region, region.status]
-        )
+        end_to_end_dap_pap_status_list.append([region.monitor_name, region.region, region.status])
     click.echo(
         tabulate(
             end_to_end_dap_pap_status_list,
@@ -186,11 +176,8 @@ def proactive_monitor_command(
     system_health_list = []
     for system_health in system_healths:
         system_health_list.append([system_health.name, system_health.status])
-    click.echo(
-        tabulate(
-            system_health_list, headers=["System Name", "Status"], tablefmt="fancy_grid"
-        )
-    )
+    click.echo(tabulate(system_health_list, headers=["System Name", "Status"], tablefmt="fancy_grid"))
+
     click.echo("- End of System Health -")
 
     # Get Datadog Error Logs
@@ -205,9 +192,7 @@ def proactive_monitor_command(
 
     error_logs_pattern_list = []
     for error_log in error_logs.error_logs_pattern_counts:
-        error_logs_pattern_list.append(
-            [error_log.service, error_log.pattern, error_log.count]
-        )
+        error_logs_pattern_list.append([error_log.service, error_log.pattern, error_log.count])
 
     click.echo(
         tabulate(
