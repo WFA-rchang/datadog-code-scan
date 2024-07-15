@@ -55,7 +55,6 @@ class QueryCallRepositoryImplementation(QueryCallRepository):
                 )
 
                 result = session.execute(statement).all()
-                print(result)
 
                 for row in result:
                     company_query_call_usages_value_object = CompanyQueryCallUsagesValueObject(
