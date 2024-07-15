@@ -37,8 +37,8 @@ class QueryCallRepositoryImplementation(QueryCallRepository):
                 statement = (
                     select(
                         mc.name.label('company_name'),
-                        func.count(case((mqc.type == '1', 1), else_=0)).label('normal_usages'),
-                        func.count(case((mqc.type == '2', 1), else_=0)).label('channel_evaluation_usages'),
+                        func.sum(case((mqc.type == '1', 1), else_=0)).label('normal_usages'),
+                        func.sum(case((mqc.type == '2', 1), else_=0)).label('channel_evaluation_usages'),
                         func.count().label('total_usages')
                     )
                     .select_from(mqc)
